@@ -36,28 +36,39 @@ def page_header():
 
 def description():
     """
-    Returns overall project description in markdown
+    Returns top-level project description (About Page) in markdown
     """
     return html.Div(children=[dcc.Markdown('''
-        # Energy Planner
-        As of today, 138 cities in the U.S. have formally announced 100% renewable energy goals or
-        targets, while others are actively considering similar goals. Despite ambition and progress,
-        conversion towards renewable energy remains challenging.
+        # COVID-19's Association with 2020 Presidential Election Results
 
-        Wind and solar power are becoming more cost effective, but they will always be unreliable
-        and intermittent sources of energy. They follow weather patterns with potential for lots of
-        variability. Solar power starts to die away right at sunset, when one of the two daily peaks
-        arrives (see orange curve for load).
+        It's no secret that the COVID-19 pandemic has affected the lives of all Americans. At best,
+        we're been sequestered at home in quarantine. At worst, we've lost the lives of people we
+        care about. We've been left to make our own opinions on the federal government's handling of 
+        this crisis. As a result, the recent presidential election has been in part a referendum on
+        the federal government's response.
 
-        **Energy Planner is a "What-If" tool to assist making power conversion plans.**
-        It can be used to explore load satisfiability under different power contribution with 
-        near-real-time energy production & consumption data.
+        Given the polarized condition of national politics in this country, it's no wonder that voter
+        sentiment on the federal response has largely fallen on party lines, but as certain jurisdictions
+        have been more greatly affected by the pandemic than others, it's natural to speculate that these
+        divisions have broken down and shifted sentiments in places that have seen large case and casualty
+        counts.
 
-        ### Data Source
-        Energy Planner utilizes near-real-time energy production & consumption data from [BPA 
-        Balancing Authority](https://www.bpa.gov/news/AboutUs/Pages/default.aspx).
-        The [data source](https://transmission.bpa.gov/business/operations/Wind/baltwg.aspx) 
-        **updates every 5 minutes**. 
+        This dashboard aims to serve as a tool for retrospective analysis on how voter sentiment has changed
+        from 2016 to 2020 and how these trends break down by state and by county.
+
+        ### Team Members
+        This project was developed by Alex Zimbalist, Brett Cotler, Cameron Webster, and Chris Rolichek
+
+        ### Possible Next Steps
+        This dashboard utilizes population data, presidential election results, and coronavired case and death counts.
+        To build on this project, it would be interesting to merge demographc and economic information such as 
+        unemployment data, income, and ethnicity as well as healthcare expenditures per capita.
+
+        ### Related Work
+        - [Mail-in-voting as it realted to COVID-19](https://www.nature.com/articles/d41586-020-02979-x)
+        - [COVID-19's effects on the election](https://www.npr.org/sections/health-shots/2020/11/06/930897912/many-places-hard-hit-by-covid-19-leaned-more-toward-trump-in-2020-than-2016)
+        - [Counties hit hardest voted for Trump](https://apnews.com/article/counties-worst-virus-surges-voted-trump-d671a483534024b5486715da6edb6ebf)
+
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
 
@@ -133,6 +144,46 @@ def what_if_tool():
             html.Div(id='hydro-scale-text', style={'marginTop': '1rem'}),
         ], className='three columns', style={'marginLeft': 5, 'marginTop': '10%'}),
     ], className='row eleven columns')
+
+
+
+def project_details():
+    """
+    Returns the project details component of the website
+    """
+    return html.Div(children=[dcc.Markdown('''
+        # Project Details
+
+        ### Data Sources
+        The dashboard uses real-time case-count data from the [COVID-19 Data Repository by the Center for 
+        Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) 
+        which updates daily. 
+        
+        General election results data from 2020 was taken from a publicy available dataset on [Kaggle]
+        (https://www.kaggle.com/unanimad/us-election-2020) and 2016 general election data came from 
+        the [MIT Election Lab](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).
+        Additionally, populaition data was taken from []() in order to compare per-capita statistics. 
+
+        ### Technology Stack
+
+        The website was produced using a Dash website application and is hosted using the Gitpod online environment.
+        The `app.py` script hosts the Dash components as well as visualizations created using Plot.ly.
+
+        ### ETL and Database Design
+
+        Our data is read from the links provided inot dataframes in the `data_aquire.py` script. Additionally, 
+        the script reformats and extracts the columns relevant to our analysis before upserting the rows of each
+        dataframe as documents to 5 different collections in a MongoDB database. These 5 collections hold vote
+        counts for 2016, vote counts for 2020, the number of new deaths for each day since February by county, the 
+        number of new cases for each day since February by county, and the population of each county. Each of these
+        collections is linked by a county idenfitication variable, which is the name of the county and the state 
+        where it is located. The `database.py` script then pulls the data from the database into dataframes that are
+        used to create the visualizations in `app.py`
+
+        [ETL_ETA Notebook](link to EDL_ETA.ipynb)
+        [Enhancement Notebook](link to Enhancement.ipynb)
+
+        ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
 
 def architecture_summary():
