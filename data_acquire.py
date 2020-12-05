@@ -33,7 +33,7 @@ def download_data(urls=urls, retries=MAX_DOWNLOAD_ATTEMPT):
     for i in range(retries):
         try:
             for i in range(len(urls)):
-                if i not (len(urls)-1):
+                if i < 4:
                     s = requests.get(urls[i], timeout=0.5).content
                     s.raise_for_status()
                     dfs.append(pd.read_csv(io.StringIO(s.decode('utf-8'))))
