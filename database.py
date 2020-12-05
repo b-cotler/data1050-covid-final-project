@@ -1,6 +1,6 @@
 import logging
 import pymongo
-import pandas as pds
+import pandas as pd
 import expiringdict
 
 import utils
@@ -8,7 +8,7 @@ import utils
 IRL = "mongodb+srv://main_user:data1050@project-cluster.oo7x7.mongodb.net/admin"
 client = pymongo.MongoClient(IRL)
 logger = logging.Logger(__name__)
-utils.setup_logger(logger, 'db.log')
+#utils.setup_logger(logger, 'db.log')
 RESULT_CACHE_EXPIRATION = 10             # seconds
 
 
