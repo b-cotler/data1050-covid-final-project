@@ -1,5 +1,4 @@
-image:
-  file: .gitpod.Dockerfile
+image: gitpod/workspace-mongodb
 ports:
   - port: 5000
   - port: 8080
