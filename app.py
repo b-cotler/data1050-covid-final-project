@@ -17,7 +17,7 @@ COLORS = ['rgb(67,67,67)', 'rgb(115,115,115)', 'rgb(49,130,189)', 'rgb(189,189,1
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', '/assets/style.css']
 
 # Define the dash app first
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 
 
 # Define component functions
@@ -134,26 +134,26 @@ def dynamic_scatter_tool():
     daily = [cases.iloc[:, i] - cases.iloc[:, i-1] for i in range(1,len(cases.columns))]
     for i in range(len(daily)):
         cases.iloc[:, i] = daily[i]
-    cases.head()
+    # cases.head()
 
     roll7 = cases.loc[:, "1/29/20_confirmed":]
     for i in range(len(roll7.columns)):
         avg = cases.iloc[:, i:i+7].mean(axis=1)
     roll7.iloc[:, i] = avg
 
-    date = "3/24/20_confirmed"
-    pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
-# print(pct_trump)
-    cases = roll7.loc[:, date]
-    total_case_density = roll7.sum() / grouped["POPESTIMATE2019"].sum()
-# print(total_case_density)
-    relative_case_density = cases / grouped["POPESTIMATE2019"] / total_case_density[date]
-# print(relative_case_density)
-    fig = plt.figure()
-    plt.scatter(pct_trump, relative_case_density, alpha = .5)
-    fig.savefig("test")
+    # date = "3/24/20_confirmed"
+    # pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
+# # print(pct_trump)
+#     cases = roll7.loc[:, date]
+#     total_case_density = roll7.sum() / grouped["POPESTIMATE2019"].sum()
+# # print(total_case_density)
+#     relative_case_density = cases / grouped["POPESTIMATE2019"] / total_case_density[date]
+# # print(relative_case_density)
+#     fig = plt.figure()
+#     plt.scatter(pct_trump, relative_case_density, alpha = .5)
+#     fig.savefig("test")
 
-    fig = plt.figure()
+#     fig = plt.figure()
 
     mark_values = {}
     for i in range(len(roll7.columns)):
@@ -190,6 +190,7 @@ def dynamic_scatter_tool():
     )
 
     def update(date_chosen):
+        pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
         x = pct_trump
         #print(roll7.columns)
         y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
