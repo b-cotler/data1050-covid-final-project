@@ -171,7 +171,7 @@ def dynamic_scatter_tool():
     mark_values = {}
     for i in range(len(roll7.columns)):
         if i % 30 == 0:
-            mark_values[i+1] = str(roll7.columns[i])
+            mark_values[i+1] = str(roll7.columns[i])[:-9]
         else:
             mark_values[i+1] = ""
 
