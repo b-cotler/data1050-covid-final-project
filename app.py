@@ -78,7 +78,7 @@ def static_stacked_trend_graph(stack=False):
     If `stack` is `True`, the 4 power sources are stacked together to show the overall power
     production.
     """
-    df = fetch_all_bpa_as_df()
+    df = fetch_all_data()
     if df is None:
         return go.Figure()
     sources = ['Wind', 'Hydro', 'Fossil/Biomass', 'Nuclear']
@@ -255,7 +255,7 @@ def update_hydro_sacle_text(value):
      dash.dependencies.Input('hydro-scale-slider', 'value')])
 def what_if_handler(wind, hydro):
     """Changes the display graph of supply-demand"""
-    df = fetch_all_bpa_as_df(allow_cached=True)
+    df = fetch_all_data()
     x = df['Datetime']
     supply = df['Wind'] * wind + df['Hydro'] * hydro + df['Fossil/Biomass'] + df['Nuclear']
     load = df['Load']
