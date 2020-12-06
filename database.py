@@ -3,7 +3,7 @@ import pymongo
 import pandas as pd
 import expiringdict
 
-import utils
+# import utils
 
 IRL = "mongodb+srv://main_user:data1050@project-cluster.oo7x7.mongodb.net/admin"
 client = pymongo.MongoClient(IRL)

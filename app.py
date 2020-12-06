@@ -4,7 +4,7 @@ import dash_html_components as html
 import numpy as np
 import plotly.graph_objects as go
 
-from database import fetch_all_bpa_as_df
+from database import fetch_all_data
 
 # Definitions of constants. This projects uses extra CSS stylesheet at `./assets/style.css`
 COLORS = ['rgb(67,67,67)', 'rgb(115,115,115)', 'rgb(49,130,189)', 'rgb(189,189,189)']
