@@ -77,28 +77,6 @@ def description():
 
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
-
-# def static_stacked_trend_graph(stack=False):
-#     """
-#     Returns scatter line plot of all power sources and power load.
-#     If `stack` is `True`, the 4 power sources are stacked together to show the overall power
-#     production.
-#     """
-#     df = fetch_all_data()
-#     if df is None:
-#         return go.Figure()
-#     sources = ['Wind', 'Hydro', 'Fossil/Biomass', 'Nuclear']
-#     x = df['Datetime']
-#     fig = go.Figure()
-#     for i, s in enumerate(sources):
-#         fig.add_trace(go.Scatter(x=x, y=df[s], mode='lines', name=s,
-#                                  line={'width': 2, 'color': COLORS[i]},
-#                                  stackgroup='stack' if stack else None))
-#     fig.add_trace(go.Scatter(x=x, y=df['Load'], mode='lines', name='Load',
-#                              line={'width': 2, 'color': 'orange'}))
-#     title = 'Energy Production & Consumption under BPA Balancing Authority'
-#     if stack:
-#         title += ' [Stacked]'
 #     fig.update_layout(template='plotly_dark',
 #                       title=title,
 #                       plot_bgcolor='#23272c',
@@ -174,44 +152,12 @@ def dynamic_scatter_tool():
     fig = plt.figure()
     plt.scatter(pct_trump, relative_case_density, alpha = .5)
     fig.savefig("test")
-# plt.pyplot.ylim(0, .03)
-    # data = [dict(
-    #     visible = False,
-    #     line=dict(color='#00CED1', width=6),
-    #     name = '𝜈 = '+str(date),
-    # x = pct_trump,
-    # y = [roll7.loc[:, date] / grouped["POPESTIMATE2019"] / ((roll7.sum() / grouped["POPESTIMATE2019"].sum())[date]) for date in roll7.columns]
-    # plot = px.Figure(data=[px.Scatter(x=x, y=y, mode='lines')])
-    # fig = px.scatter(x, y, animation_frame = df.columns)
-    # steps = []
-    # for i in range(len(data)):
-    #     step = dict(
-    #         method = 'restyle',
-    #         args = ['visible', [False] * len(data)],
-    #     )
-    #     step['args'][1][i] = True # Toggle i'th trace to "visible"
-    #     steps.append(step)
-
-    # sliders = [dict(
-    #     active = 10,
-    #     currentvalue = {"prefix": "Frequency: "},
-    #     pad = {"t": 50},
-    #     steps = steps
-    # )]
-
-    # layout = dict(sliders=sliders)
-
-    # fig = dict(data=data, layout=layout)
-    # py.iplot(fig)
-
-
-    # return html.Div(children=[
-    #     html.Div(children=[dcc.Graph(id='Dynamic_Scatter')], className='nine columns'),
 
     fig = plt.figure()
+
     mark_values = {}
-    for i in range(1, len(roll7.columns)):
-        mark_values[i] = str(roll7.columns[i])
+    for i in range(len(roll7.columns)):
+        mark_values[i+1] = str(roll7.columns[i])
 
     app.layout = html.Div([
         html.Div([
@@ -224,10 +170,10 @@ def dynamic_scatter_tool():
         ]),
 
         html.Div([
-            dcc.RangeSlider(id = 'date',
+            dcc.RangeSlider(id = 'date_slider',
                 min = 1,
                 max = len(roll7.columns),
-                # values = [1],
+                value = [1],
                 marks = mark_values,
                 step = None)
         ], style = {"width": "70%", "position": "absolute",
@@ -235,15 +181,17 @@ def dynamic_scatter_tool():
     ])
 
     @app.callback(
-        Output("Dynamic_Scatter", "figure"),
-        [Input("date", "value")]
+        dash.dependencies.Output("dynamic_graph", "figure"),
+        [dash.dependencies.Input("date_slider", "value")]
     )
 
     def update(date_chosen):
         x = pct_trump
+        print(x)
         y = roll7.loc[:, date_chosen] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen]
-        z = grouped["state"]
-        new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
+        print(y)
+        new_df = pd.DataFrame(zip(x,y), columns = ['pct_trump', 'relative_case_density'])
+        print(new_df.head())
         
         scatterplot = px.scatter(
             data_frame = new_df,
@@ -259,24 +207,9 @@ def dynamic_scatter_tool():
         
         return (scatterplot)
 
-    #     html.Div(children=[
-    #         html.H5("Rescale Power Supply", style={'marginTop': '2rem'}),
-    #         html.Div(children=[
-    #             dcc.Slider(id='date_slider', min=0, max=4, step=0.1, value=2.5, className='row',
-    #                        marks={x: str(x) for x in np.arange(0, 4.1, 1)})
-    #         ], style={'marginTop': '5rem'}),
+dynamic_scatter_tool()
 
-    #         html.Div(id='wind-scale-text', style={'marginTop': '1rem'}),
-
-    #         html.Div(children=[
-    #             dcc.Slider(id='hydro-scale-slider', min=0, max=4, step=0.1, value=0,
-    #                        className='row', marks={x: str(x) for x in np.arange(0, 4.1, 1)})
-    #         ], style={'marginTop': '3rem'}),
-    #         html.Div(id='hydro-scale-text', style={'marginTop': '1rem'}),
-    #     ], className='three columns', style={'marginLeft': 5, 'marginTop': '10%'}),
-    # ], className='row eleven columns')
-
-# dynamic_scatter_tool()
+# app.layout = dynamic_scatter_tool
 
 def project_details():
     """
@@ -404,6 +337,3 @@ def architecture_summary():
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=1050, host='0.0.0.0')
-
-# if __name__ == '__main__':
-#     app.run_server(debug = True)
