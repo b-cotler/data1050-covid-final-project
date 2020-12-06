@@ -157,7 +157,10 @@ def dynamic_scatter_tool():
 
     mark_values = {}
     for i in range(len(roll7.columns)):
-        mark_values[i+1] = str(roll7.columns[i])
+        if i % 30 == 0:
+            mark_values[i+1] = str(roll7.columns[i])
+        else:
+            mark_values[i+1] = ""
 
     app.layout = html.Div([
         html.Div([
@@ -175,7 +178,8 @@ def dynamic_scatter_tool():
                 max = len(roll7.columns),
                 value = [1],
                 marks = mark_values,
-                step = None)
+                step = None,
+                )
         ], style = {"width": "70%", "position": "absolute",
                     "left": "5%"})
     ])
@@ -187,23 +191,23 @@ def dynamic_scatter_tool():
 
     def update(date_chosen):
         x = pct_trump
-        print(x)
-        y = roll7.loc[:, date_chosen] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen]
-        print(y)
-        new_df = pd.DataFrame(zip(x,y), columns = ['pct_trump', 'relative_case_density'])
-        print(new_df.head())
+        #print(roll7.columns)
+        y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
+        #print(y)
+        z = roll7.index
+        new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
+        #print(new_df.head())
         
         scatterplot = px.scatter(
             data_frame = new_df,
             x = 'pct_trump',
             y = 'relative_case_density',
-            hover_date = ['state'],
-            text = 'state',
+            hover_data = ['state'],
             height = 550
         )
 
-        scatterplot.update_traces(testposition = 'top center')
-        scatterplot.savefig("test2")
+        scatterplot.update_traces(textposition = 'top center')
+        #scatterplot.savefig("test2")
         
         return (scatterplot)
 
