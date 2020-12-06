@@ -92,14 +92,27 @@ def dynamic_scatter():
     """
     return html.Div(children=[
         dcc.Markdown('''
-        # " What If "
-        So far, BPA has been relying on hydro power to balance the demand and supply of power. 
-        Could our city survive an outage of hydro power and use up-scaled wind power as an
-        alternative? Find below **what would happen with 2.5x wind power and no hydro power at 
-        all**.   
-        Feel free to try out more combinations with the sliders. For the clarity of demo code,
-        only two sliders are included here. A fully-functioning What-If tool should support
-        playing with other interesting aspects of the problem (e.g. instability of load).
+        # " Relative Covid Rate v. Political Demographic "
+        Donald Trump has repeatedly dismiised covid-19 and encouraged his supporters to continue their lives as normal. 
+        We wanted to see if areas where Trump received more support in the 2020 election had higher rates of covid-19 
+        than the areas that voted more in favor of Joe Biden. We compare covid-19 cases among states by calculating a 
+        "relative positivity rate" or "relative case density" for each state, which is the number of new daily cases per 
+        person divided by the nation-wide positivity rate. For example, if a given state reports twice as many new cases 
+        per 10,000 people than the country as a whole on a given day, that state's relative positivity rate on that day 
+        would be 2. For each day since the beginning of the pandemic, we calculate the 7-day rolling average of confirmed 
+        new positive cases in each state (of course, some states have more or less testing than others, so we must proceed 
+        with some concern about the accuracy of our data). It appears that early on in the pandemic, democratic states were hit 
+        harder than republican areas. This makes sense -- we recall that the early outbreaks of covid-19 were in cities, 
+        which tend to be heavily democratic. Only once the pandemic progressed did the virus spread to more rural and 
+        conservative parts of the country. Since the early days of the pandemic, we have seen the trend reverse: now, 
+        heavily Trump-supporting states are doing worse than the states that backed Joe Biden in the election. This change in 
+        trend can be seen by dragging the slider
+        in the scatterplot below.
+
+        We also note that the actual relationship between relative covid-19 positivity rate and political demographic
+        is probably more robust than what is visible in the scatterplot. This is because democratic states tend to test
+        more, and so Trump-supporting states likely have depressed case count data.
+
         ''', className='eleven columns', style={'paddingLeft': '5%'})
     ], className="row")
 
@@ -341,4 +354,4 @@ def architecture_summary():
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, port=5000, host='0.0.0.0')
+    app.run_server(debug=True, port=1050, host='0.0.0.0')
