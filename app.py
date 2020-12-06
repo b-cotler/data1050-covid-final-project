@@ -2,7 +2,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import numpy as np
+import plotly
 import plotly.graph_objects as go
+import plotly.express as px
+import matplotlib.pyplot as plt
+import pandas as pd
+from dash.dependencies import Input, Output
+
 
 from database import fetch_all_data
 
@@ -72,39 +78,39 @@ def description():
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
 
-def static_stacked_trend_graph(stack=False):
-    """
-    Returns scatter line plot of all power sources and power load.
-    If `stack` is `True`, the 4 power sources are stacked together to show the overall power
-    production.
-    """
-    df = fetch_all_data()
-    if df is None:
-        return go.Figure()
-    sources = ['Wind', 'Hydro', 'Fossil/Biomass', 'Nuclear']
-    x = df['Datetime']
-    fig = go.Figure()
-    for i, s in enumerate(sources):
-        fig.add_trace(go.Scatter(x=x, y=df[s], mode='lines', name=s,
-                                 line={'width': 2, 'color': COLORS[i]},
-                                 stackgroup='stack' if stack else None))
-    fig.add_trace(go.Scatter(x=x, y=df['Load'], mode='lines', name='Load',
-                             line={'width': 2, 'color': 'orange'}))
-    title = 'Energy Production & Consumption under BPA Balancing Authority'
-    if stack:
-        title += ' [Stacked]'
-    fig.update_layout(template='plotly_dark',
-                      title=title,
-                      plot_bgcolor='#23272c',
-                      paper_bgcolor='#23272c',
-                      yaxis_title='MW',
-                      xaxis_title='Date/Time')
-    return fig
+# def static_stacked_trend_graph(stack=False):
+#     """
+#     Returns scatter line plot of all power sources and power load.
+#     If `stack` is `True`, the 4 power sources are stacked together to show the overall power
+#     production.
+#     """
+#     df = fetch_all_data()
+#     if df is None:
+#         return go.Figure()
+#     sources = ['Wind', 'Hydro', 'Fossil/Biomass', 'Nuclear']
+#     x = df['Datetime']
+#     fig = go.Figure()
+#     for i, s in enumerate(sources):
+#         fig.add_trace(go.Scatter(x=x, y=df[s], mode='lines', name=s,
+#                                  line={'width': 2, 'color': COLORS[i]},
+#                                  stackgroup='stack' if stack else None))
+#     fig.add_trace(go.Scatter(x=x, y=df['Load'], mode='lines', name='Load',
+#                              line={'width': 2, 'color': 'orange'}))
+#     title = 'Energy Production & Consumption under BPA Balancing Authority'
+#     if stack:
+#         title += ' [Stacked]'
+#     fig.update_layout(template='plotly_dark',
+#                       title=title,
+#                       plot_bgcolor='#23272c',
+#                       paper_bgcolor='#23272c',
+#                       yaxis_title='MW',
+#                       xaxis_title='Date/Time')
+#     return fig
 
 
-def what_if_description():
+def dynamic_scatter():
     """
-    Returns description of "What-If" - the interactive component
+    Returns scatterplot of relative covid rate v. political demographic - the interactive component
     """
     return html.Div(children=[
         dcc.Markdown('''
@@ -120,32 +126,157 @@ def what_if_description():
     ], className="row")
 
 
-def what_if_tool():
+def dynamic_scatter_tool():
     """
     Returns the What-If tool as a dash `html.Div`. The view is a 8:3 division between
     demand-supply plot and rescale sliders.
     """
-    return html.Div(children=[
-        html.Div(children=[dcc.Graph(id='what-if-figure')], className='nine columns'),
+    dfs = fetch_all_data()
+    
+    df_2020 = dfs[0]
+    df_2016 = dfs[1]
+    df_confirmed = dfs[2]
+    df_deaths = dfs[3]
+    df_population = dfs[4]
 
-        html.Div(children=[
-            html.H5("Rescale Power Supply", style={'marginTop': '2rem'}),
-            html.Div(children=[
-                dcc.Slider(id='wind-scale-slider', min=0, max=4, step=0.1, value=2.5, className='row',
-                           marks={x: str(x) for x in np.arange(0, 4.1, 1)})
-            ], style={'marginTop': '5rem'}),
+    df_2020["Donald Trump 2020"] = df_2020["Donald Trump"]
+    df_2016["Donald Trump 2016"] = df_2016["Donald Trump"]
+    df_2016.drop(columns=["Donald Trump"], inplace=True)
+    df_2020.drop(columns=["Donald Trump"], inplace=True)
 
-            html.Div(id='wind-scale-text', style={'marginTop': '1rem'}),
+    df_elections = df_2016.merge(df_2020, how='inner', left_on='county_id', right_on='county_id')
+    df_covid = df_confirmed.merge(df_deaths, how='inner', left_on='county_id', right_on='county_id', suffixes=('_confirmed', '_deaths'))
+    df = df_elections.merge(df_covid, how='inner', left_on='county_id', right_on='county_id')
+    df = df.merge(df_population, how='inner', left_on='county_id', right_on='county_id')
 
-            html.Div(children=[
-                dcc.Slider(id='hydro-scale-slider', min=0, max=4, step=0.1, value=0,
-                           className='row', marks={x: str(x) for x in np.arange(0, 4.1, 1)})
-            ], style={'marginTop': '3rem'}),
-            html.Div(id='hydro-scale-text', style={'marginTop': '1rem'}),
-        ], className='three columns', style={'marginLeft': 5, 'marginTop': '10%'}),
-    ], className='row eleven columns')
+    df = df.drop_duplicates()
+
+    grouped = df.groupby("state").sum()
+    cases = grouped.loc[:, "1/23/20_confirmed":"1/22/20_deaths"].iloc[:, :-1]
+    daily = [cases.iloc[:, i] - cases.iloc[:, i-1] for i in range(1,len(cases.columns))]
+    for i in range(len(daily)):
+        cases.iloc[:, i] = daily[i]
+    cases.head()
+
+    roll7 = cases.loc[:, "1/29/20_confirmed":]
+    for i in range(len(roll7.columns)):
+        avg = cases.iloc[:, i:i+7].mean(axis=1)
+    roll7.iloc[:, i] = avg
+
+    date = "3/24/20_confirmed"
+    pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
+# print(pct_trump)
+    cases = roll7.loc[:, date]
+    total_case_density = roll7.sum() / grouped["POPESTIMATE2019"].sum()
+# print(total_case_density)
+    relative_case_density = cases / grouped["POPESTIMATE2019"] / total_case_density[date]
+# print(relative_case_density)
+    fig = plt.figure()
+    plt.scatter(pct_trump, relative_case_density, alpha = .5)
+    fig.savefig("test")
+# plt.pyplot.ylim(0, .03)
+    # data = [dict(
+    #     visible = False,
+    #     line=dict(color='#00CED1', width=6),
+    #     name = '𝜈 = '+str(date),
+    # x = pct_trump,
+    # y = [roll7.loc[:, date] / grouped["POPESTIMATE2019"] / ((roll7.sum() / grouped["POPESTIMATE2019"].sum())[date]) for date in roll7.columns]
+    # plot = px.Figure(data=[px.Scatter(x=x, y=y, mode='lines')])
+    # fig = px.scatter(x, y, animation_frame = df.columns)
+    # steps = []
+    # for i in range(len(data)):
+    #     step = dict(
+    #         method = 'restyle',
+    #         args = ['visible', [False] * len(data)],
+    #     )
+    #     step['args'][1][i] = True # Toggle i'th trace to "visible"
+    #     steps.append(step)
+
+    # sliders = [dict(
+    #     active = 10,
+    #     currentvalue = {"prefix": "Frequency: "},
+    #     pad = {"t": 50},
+    #     steps = steps
+    # )]
+
+    # layout = dict(sliders=sliders)
+
+    # fig = dict(data=data, layout=layout)
+    # py.iplot(fig)
 
 
+    # return html.Div(children=[
+    #     html.Div(children=[dcc.Graph(id='Dynamic_Scatter')], className='nine columns'),
+
+    fig = plt.figure()
+    mark_values = {}
+    for i in range(1, len(roll7.columns)):
+        mark_values[i] = str(roll7.columns[i])
+
+    app.layout = html.Div([
+        html.Div([
+            html.Pre(children = "Covid Infections and Political Preference by State",
+            style = {"text-align": "center", "font-size":"100%", "color":"black"})
+        ]),
+
+        html.Div([
+            dcc.Graph(id = 'dynamic_graph')
+        ]),
+
+        html.Div([
+            dcc.RangeSlider(id = 'date',
+                min = 1,
+                max = len(roll7.columns),
+                # values = [1],
+                marks = mark_values,
+                step = None)
+        ], style = {"width": "70%", "position": "absolute",
+                    "left": "5%"})
+    ])
+
+    @app.callback(
+        Output("Dynamic_Scatter", "figure"),
+        [Input("date", "value")]
+    )
+
+    def update(date_chosen):
+        x = pct_trump
+        y = roll7.loc[:, date_chosen] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen]
+        z = grouped["state"]
+        new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
+        
+        scatterplot = px.scatter(
+            data_frame = new_df,
+            x = 'pct_trump',
+            y = 'relative_case_density',
+            hover_date = ['state'],
+            text = 'state',
+            height = 550
+        )
+
+        scatterplot.update_traces(testposition = 'top center')
+        scatterplot.savefig("test2")
+        
+        return (scatterplot)
+
+    #     html.Div(children=[
+    #         html.H5("Rescale Power Supply", style={'marginTop': '2rem'}),
+    #         html.Div(children=[
+    #             dcc.Slider(id='date_slider', min=0, max=4, step=0.1, value=2.5, className='row',
+    #                        marks={x: str(x) for x in np.arange(0, 4.1, 1)})
+    #         ], style={'marginTop': '5rem'}),
+
+    #         html.Div(id='wind-scale-text', style={'marginTop': '1rem'}),
+
+    #         html.Div(children=[
+    #             dcc.Slider(id='hydro-scale-slider', min=0, max=4, step=0.1, value=0,
+    #                        className='row', marks={x: str(x) for x in np.arange(0, 4.1, 1)})
+    #         ], style={'marginTop': '3rem'}),
+    #         html.Div(id='hydro-scale-text', style={'marginTop': '1rem'}),
+    #     ], className='three columns', style={'marginLeft': 5, 'marginTop': '10%'}),
+    # ], className='row eleven columns')
+
+# dynamic_scatter_tool()
 
 def project_details():
     """
@@ -212,64 +343,67 @@ def architecture_summary():
     ], className='row')
 
 
-# Sequentially add page components to the app's layout
-def dynamic_layout():
-    return html.Div([
-        page_header(),
-        html.Hr(),
-        description(),
-        # dcc.Graph(id='trend-graph', figure=static_stacked_trend_graph(stack=False)),
-        dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
-        what_if_description(),
-        what_if_tool(),
-        architecture_summary(),
-    ], className='row', id='content')
+# # Sequentially add page components to the app's layout
+# def dynamic_layout():
+#     return html.Div([
+#         page_header(),
+#         html.Hr(),
+#         description(),
+#         # dcc.Graph(id='trend-graph', figure=static_stacked_trend_graph(stack=False)),
+#         dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
+#         what_if_description(),
+#         what_if_tool(),
+#         architecture_summary(),
+#     ], className='row', id='content')
 
 
-# set layout to a function which updates upon reloading
-app.layout = dynamic_layout
+# # set layout to a function which updates upon reloading
+# app.layout = dynamic_layout
 
 
-# Defines the dependencies of interactive components
+# # Defines the dependencies of interactive components
 
-@app.callback(
-    dash.dependencies.Output('wind-scale-text', 'children'),
-    [dash.dependencies.Input('wind-scale-slider', 'value')])
-def update_wind_sacle_text(value):
-    """Changes the display text of the wind slider"""
-    return "Wind Power Scale {:.2f}x".format(value)
-
-
-@app.callback(
-    dash.dependencies.Output('hydro-scale-text', 'children'),
-    [dash.dependencies.Input('hydro-scale-slider', 'value')])
-def update_hydro_sacle_text(value):
-    """Changes the display text of the hydro slider"""
-    return "Hydro Power Scale {:.2f}x".format(value)
+# @app.callback(
+#     dash.dependencies.Output('wind-scale-text', 'children'),
+#     [dash.dependencies.Input('wind-scale-slider', 'value')])
+# def update_wind_sacle_text(value):
+#     """Changes the display text of the wind slider"""
+#     return "Wind Power Scale {:.2f}x".format(value)
 
 
+# @app.callback(
+#     dash.dependencies.Output('hydro-scale-text', 'children'),
+#     [dash.dependencies.Input('hydro-scale-slider', 'value')])
+# def update_hydro_sacle_text(value):
+#     """Changes the display text of the hydro slider"""
+#     return "Hydro Power Scale {:.2f}x".format(value)
 
-@app.callback(
-    dash.dependencies.Output('what-if-figure', 'figure'),
-    [dash.dependencies.Input('wind-scale-slider', 'value'),
-     dash.dependencies.Input('hydro-scale-slider', 'value')])
-def what_if_handler(wind, hydro):
-    """Changes the display graph of supply-demand"""
-    df = fetch_all_data()
-    x = df['Datetime']
-    supply = df['Wind'] * wind + df['Hydro'] * hydro + df['Fossil/Biomass'] + df['Nuclear']
-    load = df['Load']
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=supply, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
-                  fill='tozeroy'))
-    fig.add_trace(go.Scatter(x=x, y=load, mode='none', name='demand', line={'width': 2, 'color': 'orange'},
-                  fill='tonexty'))
-    fig.update_layout(template='plotly_dark', title='Supply/Demand after Power Scaling',
-                      plot_bgcolor='#23272c', paper_bgcolor='#23272c', yaxis_title='MW',
-                      xaxis_title='Date/Time')
-    return fig
+
+# @app.callback(
+#     dash.dependencies.Output('what-if-figure', 'figure'),
+#     [dash.dependencies.Input('wind-scale-slider', 'value'),
+#      dash.dependencies.Input('hydro-scale-slider', 'value')])
+# def what_if_handler(wind, hydro):
+#     """Changes the display graph of supply-demand"""
+#     df = fetch_all_data()
+#     x = df['Datetime']
+#     supply = df['Wind'] * wind + df['Hydro'] * hydro + df['Fossil/Biomass'] + df['Nuclear']
+#     load = df['Load']
+
+#     fig = go.Figure()
+#     fig.add_trace(go.Scatter(x=x, y=supply, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
+#                   fill='tozeroy'))
+#     fig.add_trace(go.Scatter(x=x, y=load, mode='none', name='demand', line={'width': 2, 'color': 'orange'},
+#                   fill='tonexty'))
+#     fig.update_layout(template='plotly_dark', title='Supply/Demand after Power Scaling',
+#                       plot_bgcolor='#23272c', paper_bgcolor='#23272c', yaxis_title='MW',
+#                       xaxis_title='Date/Time')
+#     return fig
 
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=1050, host='0.0.0.0')
+
+# if __name__ == '__main__':
+#     app.run_server(debug = True)
