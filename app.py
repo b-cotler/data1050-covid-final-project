@@ -90,7 +90,28 @@ def description():
 #     return fig
 
 def static_scatter():
-    pass
+    return html.Div(children=[
+        dcc.Markdown('''
+        # " Covid-19 Cases and the Changing Electorate "
+        
+        Donald Trump performed far worse in the 2020 election than he did in the 2016 election. It seems likely that
+        this was in large part due to the coronavirus pandemic and his failure to effectively control the U.S. outbreak. 
+        We wanted to know if the areas that were hit especially hard by covid-19 up until the election turned against 
+        Trump more than areas that had fewer cases. We attempt to shed light on this question by calculating the difference 
+        between the percent of the vote Trump received in each state in 2016 and the percent of the vote Trump received in 
+        each state in 2020. Did Trump disproportionately underperform relative to 2016 in areas hit harder by the virus?
+
+        The scatterplot below shows the cumulative number of confirmed cases along the y axis and the change in the percent 
+        of the vote Trump received in 2016 and 2020 (where a positive change indicates better performance in 2020 than 
+        in 2016) on the axis. As we can see, Trump performed worse in many states in 2020, and better in only a few (this 
+        isn't terribly surprising, given that he won the 2016 election but lost the 2020 election). However, it appears 
+        that Trump's diminished support was across-the-board; that is, he performed worse by a similar amount in both states 
+        that were hit hard by the virus and states that had endured milder outbreaks. In other words, the scatterplot 
+        does not show a strong correlation between the change in Trump's support from 2016 to 2020 and the severity of 
+        the covid-19 pandemic in that area up until election day.
+
+        ''', className='eleven columns', style={'paddingLeft': '5%'})
+    ], className="row")
 
 def static_scatter_tool():
     pct_trump_2020 = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
