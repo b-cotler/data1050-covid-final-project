@@ -3,13 +3,13 @@ Bonneville Power Administration, United States Department of Energy
 """
 import time
 import sched
-import pandas
+import pandas as pd
 import logging
 import requests
 from io import StringIO
 
-import utils
-from database import upsert_bpa
+#import utils
+from database import upsert_data
 
 
 election_2020_url = "https://raw.githubusercontent.com/b-cotler/data1050-covid-final-project/main/data/president_county_candidate.csv" 
@@ -22,7 +22,7 @@ urls = [election_2016_url, election_2020_url, confirmed_url, deaths_url]
 MAX_DOWNLOAD_ATTEMPT = 5
 DOWNLOAD_PERIOD = 10         # second
 logger = logging.Logger(__name__)
-utils.setup_logger(logger, 'data.log')
+#utils.setup_logger(logger, 'data.log')
 
 
 def download_data(urls=urls, retries=MAX_DOWNLOAD_ATTEMPT):
@@ -32,15 +32,16 @@ def download_data(urls=urls, retries=MAX_DOWNLOAD_ATTEMPT):
     text = None
     for i in range(retries):
         try:
+            dfs = []
             for i in range(len(urls)):
                 if i < 4:
                     s = requests.get(urls[i], timeout=0.5).content
                     s.raise_for_status()
-                    dfs.append(pd.read_csv(io.StringIO(s.decode('utf-8'))))
+                    dfs.append(pd.read_csv(StringIO(s.decode('utf-8'))))
                 else:
                     s = requests.get()
                     s.raise_for_status()
-                    dfs.append(pd.read_csv(io.StringIO(s.decode('ISO-8859-1'))))
+                    dfs.append(pd.read_csv(StringIO(s.decode('ISO-8859-1'))))
         except requests.exceptions.HTTPError as e:
             logger.warning("Retry on HTTP Error: {}".format(e))
     if len(dfs) < 5:
