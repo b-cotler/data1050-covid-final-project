@@ -19,9 +19,13 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', '/assets/s
 # Define the dash app first
 app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 
+dfs = fetch_all_data()
+    
+grouped = dfs[0]
+roll7 = dfs[1].loc[:, "3/1/20_confirmed":]
+roll7.reset_index(drop=True)
 
 # Define component functions
-
 
 def page_header():
     """
@@ -85,6 +89,23 @@ def description():
 #                       xaxis_title='Date/Time')
 #     return fig
 
+def static_scatter():
+    pass
+
+def static_scatter_tool():
+    pct_trump_2020 = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
+    pct_trump_2016 = grouped["Donald Trump 2016"] / (grouped["Donald Trump 2016"] + grouped["Hillary Clinton"])
+    pct_change = pct_trump_2020 - pct_trump_2016
+    election_day_total_cases = grouped["11/3/20_confirmed"]
+    # fig = plt.figure()
+    # plt.scatter(pct_change, election_day_total_cases)
+    # plt.savefig('test2')
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=pct_change, y=election_day_total_cases, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
+                  fill='tozeroy'))
+    return fig
+
+static_scatter_tool()
 
 def dynamic_scatter():
     """
@@ -122,11 +143,12 @@ def dynamic_scatter_tool():
     Returns the What-If tool as a dash `html.Div`. The view is a 8:3 division between
     demand-supply plot and rescale sliders.
     """
-    dfs = fetch_all_data()
+    # dfs = fetch_all_data()
     
-    grouped = dfs[0]
-    roll7 = dfs[1].loc[:, "3/1/20_confirmed":]
-    roll7.reset_index(drop=True)
+    # grouped = dfs[0]
+    # roll7 = dfs[1].loc[:, "3/1/20_confirmed":]
+    # roll7.reset_index(drop=True)
+
     # df_confirmed = dfs[2]
     # df_deaths = dfs[3]
     # df_population = dfs[4]
@@ -213,7 +235,6 @@ def dynamic_scatter_tool():
         y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
         z = grouped["state"]
         new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
-        print(new_df.head())
         
         scatterplot = px.scatter(
             data_frame = new_df,
