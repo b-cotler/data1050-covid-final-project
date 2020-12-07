@@ -125,7 +125,7 @@ def dynamic_scatter_tool():
     dfs = fetch_all_data()
     
     grouped = dfs[0]
-    roll7 = dfs[1]
+    roll7 = dfs[1].loc[:, "3/1/20_confirmed":]
     roll7.reset_index(drop=True)
     # df_confirmed = dfs[2]
     # df_deaths = dfs[3]
@@ -207,23 +207,13 @@ def dynamic_scatter_tool():
     #     return 'You have selected ' + str(value[0])
 
     def update(date_chosen):
-        pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
+        pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
         x = pct_trump
+        roll7.drop(["state"], axis = 1)
         y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
-        z = roll7.index
-        state_names = ['Alabama', 'Arizona', 'Arkansas', 'California', 'Colorado',
-       'Connecticut', 'Delaware', 'District of Columbia', 'Florida', 'Georgia',
-       'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-       'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-       'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
-       'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
-       'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
-       'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-       'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
-       'West Virginia', 'Wisconsin', 'Wyoming']
-        z = state_names
+        z = grouped["state"]
         new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
-        # print(new_df.head())
+        print(new_df.head())
         
         scatterplot = px.scatter(
             data_frame = new_df,

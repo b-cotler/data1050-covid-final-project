@@ -31,7 +31,7 @@ RESULT_CACHE_EXPIRATION = 10             # seconds
 
 
 def fetch_all_data():
-    db = client.get_database("elections_and_covid_3")
+    db = client.get_database("elections_and_covid_4")
     df_names = ["grouped", "roll7"]
     dfs = []
 
