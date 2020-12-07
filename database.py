@@ -12,27 +12,27 @@ logger = logging.Logger(__name__)
 RESULT_CACHE_EXPIRATION = 10             # seconds
 
 
-def upsert_data(collection_names):
-    """
-    Update MongoDB database `energy` and collection `energy` with the given `DataFrame`.
-    """
-    for collection_df in collection_names:
-        db = client.get_database("elections_and_covid")
-        collection = db.get_collection(collection_df[1])
-        update_count = 0
-        for record in collection_df[0].to_dict('records'):
-            result = collection.replace_one(
-                filter={'county_id': record['county_id']},    # locate the document if exists
-                replacement=record,                         # latest document
-                upsert=True)                                # update if exists, insert if not
-            if result.matched_count > 0:
-                update_count += 1
-            result = collection.insert_one(record)
+# def upsert_data(collection_names):
+#     """
+#     Update MongoDB database `energy` and collection `energy` with the given `DataFrame`.
+#     """
+#     for collection_df in collection_names:
+#         db = client.get_database("elections_and_covid")
+#         collection = db.get_collection(collection_df[1])
+#         update_count = 0
+#         for record in collection_df[0].to_dict('records'):
+#             result = collection.replace_one(
+#                 filter={'county_id': record['county_id']},    # locate the document if exists
+#                 replacement=record,                         # latest document
+#                 upsert=True)                                # update if exists, insert if not
+#             if result.matched_count > 0:
+#                 update_count += 1
+#             result = collection.insert_one(record)
 
 
 def fetch_all_data():
-    db = client.get_database("elections_and_covid")
-    df_names = ["df_2020", "df_2016", "df_confirmed", "df_deaths", "df_population"]
+    db = client.get_database("elections_and_covid_3")
+    df_names = ["grouped", "roll7"]
     dfs = []
 
     for df_name in df_names:
@@ -75,4 +75,5 @@ def fetch_all_data():
 
 
 if __name__ == '__main__':
-    print(fetch_all_data())
+    pass
+    # print(fetch_all_data())

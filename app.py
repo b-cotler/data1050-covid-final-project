@@ -124,35 +124,36 @@ def dynamic_scatter_tool():
     """
     dfs = fetch_all_data()
     
-    df_2020 = dfs[0]
-    df_2016 = dfs[1]
-    df_confirmed = dfs[2]
-    df_deaths = dfs[3]
-    df_population = dfs[4]
+    grouped = dfs[0]
+    roll7 = dfs[1]
+    roll7.reset_index(drop=True)
+    # df_confirmed = dfs[2]
+    # df_deaths = dfs[3]
+    # df_population = dfs[4]
 
-    df_2020["Donald Trump 2020"] = df_2020["Donald Trump"]
-    df_2016["Donald Trump 2016"] = df_2016["Donald Trump"]
-    df_2016.drop(columns=["Donald Trump"], inplace=True)
-    df_2020.drop(columns=["Donald Trump"], inplace=True)
+    # df_2020["Donald Trump 2020"] = df_2020["Donald Trump"]
+    # df_2016["Donald Trump 2016"] = df_2016["Donald Trump"]
+    # df_2016.drop(columns=["Donald Trump"], inplace=True)
+    # df_2020.drop(columns=["Donald Trump"], inplace=True)
 
-    df_elections = df_2016.merge(df_2020, how='inner', left_on='county_id', right_on='county_id')
-    df_covid = df_confirmed.merge(df_deaths, how='inner', left_on='county_id', right_on='county_id', suffixes=('_confirmed', '_deaths'))
-    df = df_elections.merge(df_covid, how='inner', left_on='county_id', right_on='county_id')
-    df = df.merge(df_population, how='inner', left_on='county_id', right_on='county_id')
+    # df_elections = df_2016.merge(df_2020, how='inner', left_on='county_id', right_on='county_id')
+    # df_covid = df_confirmed.merge(df_deaths, how='inner', left_on='county_id', right_on='county_id', suffixes=('_confirmed', '_deaths'))
+    # df = df_elections.merge(df_covid, how='inner', left_on='county_id', right_on='county_id')
+    # df = df.merge(df_population, how='inner', left_on='county_id', right_on='county_id')
 
-    df = df.drop_duplicates()
+    # df = df.drop_duplicates()
 
-    grouped = df.groupby("state").sum()
-    cases = grouped.loc[:, "1/23/20_confirmed":"1/22/20_deaths"].iloc[:, :-1]
-    daily = [cases.iloc[:, i] - cases.iloc[:, i-1] for i in range(1,len(cases.columns))]
-    for i in range(len(daily)):
-        cases.iloc[:, i] = daily[i]
-    # cases.head()
+    # grouped = df.groupby("state").sum()
+    # cases = grouped.loc[:, "1/23/20_confirmed":"1/22/20_deaths"].iloc[:, :-1]
+    # daily = [cases.iloc[:, i] - cases.iloc[:, i-1] for i in range(1,len(cases.columns))]
+    # for i in range(len(daily)):
+    #     cases.iloc[:, i] = daily[i]
+    # # cases.head()
 
-    roll7 = cases.loc[:, "1/29/20_confirmed":]
-    for i in range(len(roll7.columns)):
-        avg = cases.iloc[:, i:i+7].mean(axis=1)
-    roll7.iloc[:, i] = avg
+    # roll7 = cases.loc[:, "1/29/20_confirmed":]
+    # for i in range(len(roll7.columns)):
+    #     avg = cases.iloc[:, i:i+7].mean(axis=1)
+    # roll7.iloc[:, i] = avg
 
     # date = "3/24/20_confirmed"
     # pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
@@ -171,15 +172,15 @@ def dynamic_scatter_tool():
     mark_values = {}
     for i in range(len(roll7.columns)):
         if i % 30 == 0:
-            mark_values[i+1] = str(roll7.columns[i])[:-9]
-        # else:
-        #     mark_values[i+1] = ""
+            mark_values[i+1] = str(roll7.columns[i])[:-10]
+        else:
+            mark_values[i+1] = ""
 
     app.layout = html.Div([
-        html.Div([
-            html.Pre(children = "Covid Infections and Political Preference by State",
-            style = {"text-align": "center", "font-size":"100%", "color":"black"})
-        ]),
+        # html.Div([
+        #     html.Pre(children = "Covid Infections and Political Preference by State",
+        #     style = {"text-align": "center", "font-size":"100%", "color":"black"})
+        # ]),
 
         html.Div([
             dcc.Graph(id = 'dynamic_graph')
@@ -202,15 +203,27 @@ def dynamic_scatter_tool():
         [dash.dependencies.Input("date_slider", "value")]
     )
 
+    # def update_output(value):
+    #     return 'You have selected ' + str(value[0])
+
     def update(date_chosen):
         pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
         x = pct_trump
-        #print(roll7.columns)
         y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
-        #print(y)
         z = roll7.index
+        state_names = ['Alabama', 'Arizona', 'Arkansas', 'California', 'Colorado',
+       'Connecticut', 'Delaware', 'District of Columbia', 'Florida', 'Georgia',
+       'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+       'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+       'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+       'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+       'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+       'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+       'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+       'West Virginia', 'Wisconsin', 'Wyoming']
+        z = state_names
         new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
-        #print(new_df.head())
+        # print(new_df.head())
         
         scatterplot = px.scatter(
             data_frame = new_df,
@@ -221,13 +234,25 @@ def dynamic_scatter_tool():
         )
 
         scatterplot.update_traces(textposition = 'top center')
-        #scatterplot.savefig("test2")
+        scatterplot.update_layout(template='plotly_dark',
+                    title="Relative Covid-19 Rate v. 2020 Election Outcome by State",
+                    plot_bgcolor='#23272c',
+                    paper_bgcolor='#23272c',
+                    yaxis_title='Relative Covid-19 Rate',
+                    xaxis_title='2020 Percent Vote for Trump')
+        scatterplot.add_annotation(dict(font=dict(color='yellow',size=15),
+                                        x=0,
+                                        y=-0.12,
+                                        showarrow=False,
+                                        text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
+                                        textangle=0,
+                                        xanchor='left',
+                                        xref="paper",
+                                        yref="paper"))
         
         return (scatterplot)
 
 dynamic_scatter_tool()
-
-# app.layout = dynamic_scatter_tool
 
 def project_details():
     """
