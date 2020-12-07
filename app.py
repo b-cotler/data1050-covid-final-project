@@ -32,15 +32,15 @@ def page_header():
     Returns the page header as a dash `html.Div`
     """
     return html.Div(id='header', children=[
-        html.Div([html.H3('Visualization with datashader and Plotly')],
+        html.Div([html.H3('Data1050 Final Project')],
                  className="ten columns"),
         html.A([html.Img(id='logo', src=app.get_asset_url('github.png'),
                          style={'height': '35px', 'paddingTop': '7%'}),
-                html.Span('Blownhither', style={'fontSize': '2rem', 'height': '35px', 'bottom': 0,
+                html.Span('github', style={'fontSize': '2rem', 'height': '35px', 'bottom': 0,
                                                 'paddingLeft': '4px', 'color': '#a3a7b0',
                                                 'textDecoration': 'none'})],
                className="two columns row",
-               href='https://github.com/blownhither/'),
+               href='https://github.com/b-cotler/data1050-covid-final-project'),
     ], className="row")
 
 
@@ -49,7 +49,7 @@ def description():
     Returns top-level project description (About Page) in markdown
     """
     return html.Div(children=[dcc.Markdown('''
-        # COVID-19's Association with 2020 Presidential Election Results
+        # COVID-19 and Political Demographics
 
         It's no secret that the COVID-19 pandemic has affected the lives of all Americans. At best,
         we're been sequestered at home in quarantine. At worst, we've lost the lives of people we
@@ -92,7 +92,11 @@ def description():
 def static_scatter():
     return html.Div(children=[
         dcc.Markdown('''
-        # " Covid-19 Cases and the Changing Electorate "
+        #
+        ##
+        #
+        ## 
+        # "Covid-19 Cases and the Changing Electorate"
         
         Donald Trump performed far worse in the 2020 election than he did in the 2016 election. It seems likely that
         this was in large part due to the coronavirus pandemic and his failure to effectively control the U.S. outbreak. 
@@ -122,11 +126,17 @@ def static_scatter_tool():
     # plt.scatter(pct_change, election_day_total_cases)
     # plt.savefig('test2')
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=pct_change, y=election_day_total_cases, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
-                  fill='tozeroy'))
+    fig.add_trace(go.Scatter(x=pct_change, y=election_day_total_cases, mode='markers', name='static_scatter'))
+
+    fig.update_layout(template='plotly_dark',
+                      title="Covid-19 and Trump's Reelection Bid",
+                      plot_bgcolor='#23272c',
+                      paper_bgcolor='#23272c',
+                      yaxis_title='Cumulative Covid Cases By State On Election Day',
+                      xaxis_title='Change in Percentage of Trump Votes (2016 to 2020)')
     return fig
 
-static_scatter_tool()
+# static_scatter_tool()
 
 def dynamic_scatter():
     """
@@ -154,6 +164,7 @@ def dynamic_scatter():
         We also note that the actual relationship between relative covid-19 positivity rate and political demographic
         is probably more robust than what is visible in the scatterplot. This is because democratic states tend to test
         more, and so Trump-supporting states likely have depressed case count data.
+
 
         ''', className='eleven columns', style={'paddingLeft': '5%'})
     ], className="row")
@@ -219,7 +230,7 @@ def dynamic_scatter_tool():
         else:
             mark_values[i+1] = ""
 
-    app.layout = html.Div([
+    return html.Div([
         # html.Div([
         #     html.Pre(children = "Covid Infections and Political Preference by State",
         #     style = {"text-align": "center", "font-size":"100%", "color":"black"})
@@ -238,53 +249,57 @@ def dynamic_scatter_tool():
                 step = None,
                 )
         ], style = {"width": "70%", "position": "absolute",
-                    "left": "5%"})
+                    "left": "5%"}),
+        dcc.Markdown('''
+        #
+        # 
+        ''')
     ])
 
-    @app.callback(
-        dash.dependencies.Output("dynamic_graph", "figure"),
-        [dash.dependencies.Input("date_slider", "value")]
-    )
 
-    # def update_output(value):
-    #     return 'You have selected ' + str(value[0])
+    # @app.callback(
+    #     dash.dependencies.Output("dynamic_graph", "figure"),
+    #     [dash.dependencies.Input("date_slider", "value")]
+    # )
 
-    def update(date_chosen):
-        pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
-        x = pct_trump
-        roll7.drop(["state"], axis = 1)
-        y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
-        z = grouped["state"]
-        new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
+    # # def update_output(value):
+    # #     return 'You have selected ' + str(value[0])
+
+    # def update(date_chosen):
+    #     pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
+    #     x = pct_trump
+    #     roll7.drop(["state"], axis = 1)
+    #     y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
+    #     z = grouped["state"]
+    #     new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
         
-        scatterplot = px.scatter(
-            data_frame = new_df,
-            x = 'pct_trump',
-            y = 'relative_case_density',
-            hover_data = ['state'],
-            height = 550
-        )
+    #     scatterplot = px.scatter(
+    #         data_frame = new_df,
+    #         x = 'pct_trump',
+    #         y = 'relative_case_density',
+    #         hover_data = ['state'],
+    #         height = 550
+    #     )
 
-        scatterplot.update_traces(textposition = 'top center')
-        scatterplot.update_layout(template='plotly_dark',
-                    title="Relative Covid-19 Rate v. 2020 Election Outcome by State",
-                    plot_bgcolor='#23272c',
-                    paper_bgcolor='#23272c',
-                    yaxis_title='Relative Covid-19 Rate',
-                    xaxis_title='2020 Percent Vote for Trump')
-        scatterplot.add_annotation(dict(font=dict(color='yellow',size=15),
-                                        x=0,
-                                        y=-0.12,
-                                        showarrow=False,
-                                        text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
-                                        textangle=0,
-                                        xanchor='left',
-                                        xref="paper",
-                                        yref="paper"))
+    #     scatterplot.update_traces(textposition = 'top center')
+    #     scatterplot.update_layout(template='plotly_dark',
+    #                 title="Relative Covid-19 Rate v. 2020 Election Outcome by State",
+    #                 plot_bgcolor='#23272c',
+    #                 paper_bgcolor='#23272c',
+    #                 yaxis_title='Relative Covid-19 Rate',
+    #                 xaxis_title='2020 Percent Vote for Trump')
+    #     scatterplot.add_annotation(dict(font=dict(color='yellow',size=15),
+    #                                     x=0,
+    #                                     y=-0.12,
+    #                                     showarrow=False,
+    #                                     text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
+    #                                     textangle=0,
+    #                                     xanchor='left',
+    #                                     xref="paper",
+    #                                     yref="paper"))
         
-        return (scatterplot)
+    #     return (scatterplot)
 
-dynamic_scatter_tool()
 
 def project_details():
     """
@@ -330,7 +345,14 @@ def architecture_summary():
     Returns the text and image of architecture summary of the project.
     """
     return html.Div(children=[
+       
         dcc.Markdown('''
+            #
+            ##
+            ###
+            #
+            ##
+            ###
             # Project Architecture
             This project uses MongoDB as the database. All data acquired are stored in raw form to the
             database (with de-duplication). An abstract layer is built in `database.py` so all queries
@@ -352,22 +374,66 @@ def architecture_summary():
 
 
 # # Sequentially add page components to the app's layout
-# def dynamic_layout():
-#     return html.Div([
-#         page_header(),
-#         html.Hr(),
-#         description(),
-#         # dcc.Graph(id='trend-graph', figure=static_stacked_trend_graph(stack=False)),
-#         dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
-#         what_if_description(),
-#         what_if_tool(),
-#         architecture_summary(),
-#     ], className='row', id='content')
+def dynamic_layout():
+    return html.Div([
+        page_header(),
+        html.Hr(),
+        description(),
+        # dcc.Graph(id='trend-graph', figure=static_stacked_trend_graph(stack=False)),
+        # dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
+        dynamic_scatter(),
+        dynamic_scatter_tool(),
+        static_scatter(),
+        dcc.Graph(id='static_scatter', figure=static_scatter_tool()),
+        architecture_summary(),
+    ], className='row', id='content')
 
 
 # # set layout to a function which updates upon reloading
-# app.layout = dynamic_layout
+app.layout = dynamic_layout
 
+@app.callback(
+    dash.dependencies.Output("dynamic_graph", "figure"),
+    [dash.dependencies.Input("date_slider", "value")]
+)
+
+# def update_output(value):
+#     return 'You have selected ' + str(value[0])
+
+def update(date_chosen):
+    pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
+    x = pct_trump
+    roll7.drop(["state"], axis = 1)
+    y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
+    z = grouped["state"]
+    new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
+    
+    scatterplot = px.scatter(
+        data_frame = new_df,
+        x = 'pct_trump',
+        y = 'relative_case_density',
+        hover_data = ['state'],
+        height = 550
+    )
+
+    scatterplot.update_traces(textposition = 'top center')
+    scatterplot.update_layout(template='plotly_dark',
+                title="Relative Covid-19 Rate v. 2020 Election Outcome by State",
+                plot_bgcolor='#23272c',
+                paper_bgcolor='#23272c',
+                yaxis_title='Relative Covid-19 Rate',
+                xaxis_title='2020 Percent Vote for Trump')
+    scatterplot.add_annotation(dict(font=dict(color='yellow',size=15),
+                                    x=0,
+                                    y=-0.12,
+                                    showarrow=False,
+                                    text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
+                                    textangle=0,
+                                    xanchor='left',
+                                    xref="paper",
+                                    yref="paper"))
+    
+    return (scatterplot)
 
 # # Defines the dependencies of interactive components
 
