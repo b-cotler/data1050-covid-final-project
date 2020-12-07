@@ -316,7 +316,8 @@ def project_details():
         General election results data from 2020 was taken from a publicy available dataset on [Kaggle]
         (https://www.kaggle.com/unanimad/us-election-2020) and 2016 general election data came from 
         the [MIT Election Lab](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).
-        Additionally, populaition data was taken from []() in order to compare per-capita statistics. 
+        Additionally, populaition data was taken from [The US Census Bureau](https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/)
+        in order to compare per-capita statistics. 
 
         ### Technology Stack
 
