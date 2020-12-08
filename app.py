@@ -52,7 +52,7 @@ def description():
         # COVID-19 and Political Demographics
 
         It's no secret that the COVID-19 pandemic has affected the lives of all Americans. At best,
-        we're been sequestered at home in quarantine. At worst, we've lost the lives of people we
+        we've been sequestered at home in quarantine. At worst, we've lost the lives of people we
         care about. We've been left to make our own opinions on the federal government's handling of 
         this crisis. As a result, the recent presidential election has been in part a referendum on
         the federal government's response.
@@ -67,7 +67,7 @@ def description():
         from 2016 to 2020 and how these trends break down by state and by county.
 
         ### Team Members
-        This project was developed by Alex Zimbalist, Brett Cotler, Cameron Webster, and Chris Rolichek
+        This project was developed by Alex Zimbalist, Brett Cotler, Cameron Webster, and Chris Rohlicek
 
         ### Possible Next Steps
         This dashboard utilizes population data, presidential election results, and coronavired case and death counts.
@@ -145,7 +145,7 @@ def dynamic_scatter():
     return html.Div(children=[
         dcc.Markdown('''
         # Relative Covid Rate v. Political Demographic
-        Donald Trump has repeatedly dismiised covid-19 and encouraged his supporters to continue their lives as normal. 
+        Donald Trump has repeatedly dismissed covid-19 and encouraged his supporters to continue their lives as normal. 
         We wanted to see if areas where Trump received more support in the 2020 election had higher rates of covid-19 
         than the areas that voted more in favor of Joe Biden. We compare covid-19 cases among states by calculating a 
         "relative positivity rate" or "relative case density" for each state, which is the number of new daily cases per 
