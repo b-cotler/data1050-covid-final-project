@@ -41,6 +41,7 @@ def fetch_all_data():
         logger.info(str(len(data)) + ' documents read from the db')
         df = pd.DataFrame.from_records(data)    
         df.drop('_id', axis=1, inplace=True)
+        df.drop_duplicates()
         dfs.append(df)
 
     return dfs

@@ -96,7 +96,7 @@ def static_scatter():
         ##
         #
         ## 
-        # "Covid-19 Cases and the Changing Electorate"
+        # Covid-19 Cases and the Changing Electorate
         
         Donald Trump performed far worse in the 2020 election than he did in the 2016 election. It seems likely that
         this was in large part due to the coronavirus pandemic and his failure to effectively control the U.S. outbreak. 
@@ -144,7 +144,7 @@ def dynamic_scatter():
     """
     return html.Div(children=[
         dcc.Markdown('''
-        # " Relative Covid Rate v. Political Demographic "
+        # Relative Covid Rate v. Political Demographic
         Donald Trump has repeatedly dismiised covid-19 and encouraged his supporters to continue their lives as normal. 
         We wanted to see if areas where Trump received more support in the 2020 election had higher rates of covid-19 
         than the areas that voted more in favor of Joe Biden. We compare covid-19 cases among states by calculating a 
@@ -175,53 +175,6 @@ def dynamic_scatter_tool():
     Returns the What-If tool as a dash `html.Div`. The view is a 8:3 division between
     demand-supply plot and rescale sliders.
     """
-    # dfs = fetch_all_data()
-    
-    # grouped = dfs[0]
-    # roll7 = dfs[1].loc[:, "3/1/20_confirmed":]
-    # roll7.reset_index(drop=True)
-
-    # df_confirmed = dfs[2]
-    # df_deaths = dfs[3]
-    # df_population = dfs[4]
-
-    # df_2020["Donald Trump 2020"] = df_2020["Donald Trump"]
-    # df_2016["Donald Trump 2016"] = df_2016["Donald Trump"]
-    # df_2016.drop(columns=["Donald Trump"], inplace=True)
-    # df_2020.drop(columns=["Donald Trump"], inplace=True)
-
-    # df_elections = df_2016.merge(df_2020, how='inner', left_on='county_id', right_on='county_id')
-    # df_covid = df_confirmed.merge(df_deaths, how='inner', left_on='county_id', right_on='county_id', suffixes=('_confirmed', '_deaths'))
-    # df = df_elections.merge(df_covid, how='inner', left_on='county_id', right_on='county_id')
-    # df = df.merge(df_population, how='inner', left_on='county_id', right_on='county_id')
-
-    # df = df.drop_duplicates()
-
-    # grouped = df.groupby("state").sum()
-    # cases = grouped.loc[:, "1/23/20_confirmed":"1/22/20_deaths"].iloc[:, :-1]
-    # daily = [cases.iloc[:, i] - cases.iloc[:, i-1] for i in range(1,len(cases.columns))]
-    # for i in range(len(daily)):
-    #     cases.iloc[:, i] = daily[i]
-    # # cases.head()
-
-    # roll7 = cases.loc[:, "1/29/20_confirmed":]
-    # for i in range(len(roll7.columns)):
-    #     avg = cases.iloc[:, i:i+7].mean(axis=1)
-    # roll7.iloc[:, i] = avg
-
-    # date = "3/24/20_confirmed"
-    # pct_trump = grouped["Donald Trump 2020"] / (grouped["POPESTIMATE2019"])
-# # print(pct_trump)
-#     cases = roll7.loc[:, date]
-#     total_case_density = roll7.sum() / grouped["POPESTIMATE2019"].sum()
-# # print(total_case_density)
-#     relative_case_density = cases / grouped["POPESTIMATE2019"] / total_case_density[date]
-# # print(relative_case_density)
-#     fig = plt.figure()
-#     plt.scatter(pct_trump, relative_case_density, alpha = .5)
-#     fig.savefig("test")
-
-#     fig = plt.figure()
 
     mark_values = {}
     for i in range(len(roll7.columns)):
@@ -241,12 +194,13 @@ def dynamic_scatter_tool():
         ]),
 
         html.Div([
-            dcc.RangeSlider(id = 'date_slider',
+            dcc.Slider(id = 'date_slider',
                 min = 1,
                 max = len(roll7.columns),
-                value = [1],
+                value = 1,
                 marks = mark_values,
                 step = None,
+                included = False
                 )
         ], style = {"width": "70%", "position": "absolute",
                     "left": "5%"}),
@@ -255,50 +209,6 @@ def dynamic_scatter_tool():
         # 
         ''')
     ])
-
-
-    # @app.callback(
-    #     dash.dependencies.Output("dynamic_graph", "figure"),
-    #     [dash.dependencies.Input("date_slider", "value")]
-    # )
-
-    # # def update_output(value):
-    # #     return 'You have selected ' + str(value[0])
-
-    # def update(date_chosen):
-    #     pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
-    #     x = pct_trump
-    #     roll7.drop(["state"], axis = 1)
-    #     y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
-    #     z = grouped["state"]
-    #     new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
-        
-    #     scatterplot = px.scatter(
-    #         data_frame = new_df,
-    #         x = 'pct_trump',
-    #         y = 'relative_case_density',
-    #         hover_data = ['state'],
-    #         height = 550
-    #     )
-
-    #     scatterplot.update_traces(textposition = 'top center')
-    #     scatterplot.update_layout(template='plotly_dark',
-    #                 title="Relative Covid-19 Rate v. 2020 Election Outcome by State",
-    #                 plot_bgcolor='#23272c',
-    #                 paper_bgcolor='#23272c',
-    #                 yaxis_title='Relative Covid-19 Rate',
-    #                 xaxis_title='2020 Percent Vote for Trump')
-    #     scatterplot.add_annotation(dict(font=dict(color='yellow',size=15),
-    #                                     x=0,
-    #                                     y=-0.12,
-    #                                     showarrow=False,
-    #                                     text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
-    #                                     textangle=0,
-    #                                     xanchor='left',
-    #                                     xref="paper",
-    #                                     yref="paper"))
-        
-    #     return (scatterplot)
 
 
 def project_details():
@@ -398,17 +308,16 @@ app.layout = dynamic_layout
     [dash.dependencies.Input("date_slider", "value")]
 )
 
-# def update_output(value):
-#     return 'You have selected ' + str(value[0])
-
 def update(date_chosen):
+    print(date_chosen)
     pct_trump = grouped["Donald Trump 2020"] / (grouped["Donald Trump 2020"] + grouped["Joe Biden"])
     x = pct_trump
     roll7.drop(["state"], axis = 1)
-    y = roll7.iloc[:, date_chosen[0]] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen[0]]
+    y = roll7.iloc[:, date_chosen] / grouped["POPESTIMATE2019"] / (roll7.sum() / grouped["POPESTIMATE2019"].sum())[date_chosen]
     z = grouped["state"]
     new_df = pd.DataFrame(zip(x,y,z), columns = ['pct_trump', 'relative_case_density', 'state'])
-    
+    new_df.drop_duplicates(subset = ["state"], inplace = True)
+
     scatterplot = px.scatter(
         data_frame = new_df,
         x = 'pct_trump',
@@ -428,54 +337,13 @@ def update(date_chosen):
                                     x=0,
                                     y=-0.12,
                                     showarrow=False,
-                                    text="You have selected the date " + str(roll7.columns[date_chosen[0]-1][:-10]),
+                                    text="You have selected the date " + str(roll7.columns[date_chosen-1][:-10]),
                                     textangle=0,
                                     xanchor='left',
                                     xref="paper",
                                     yref="paper"))
     
     return (scatterplot)
-
-# # Defines the dependencies of interactive components
-
-# @app.callback(
-#     dash.dependencies.Output('wind-scale-text', 'children'),
-#     [dash.dependencies.Input('wind-scale-slider', 'value')])
-# def update_wind_sacle_text(value):
-#     """Changes the display text of the wind slider"""
-#     return "Wind Power Scale {:.2f}x".format(value)
-
-
-# @app.callback(
-#     dash.dependencies.Output('hydro-scale-text', 'children'),
-#     [dash.dependencies.Input('hydro-scale-slider', 'value')])
-# def update_hydro_sacle_text(value):
-#     """Changes the display text of the hydro slider"""
-#     return "Hydro Power Scale {:.2f}x".format(value)
-
-
-
-# @app.callback(
-#     dash.dependencies.Output('what-if-figure', 'figure'),
-#     [dash.dependencies.Input('wind-scale-slider', 'value'),
-#      dash.dependencies.Input('hydro-scale-slider', 'value')])
-# def what_if_handler(wind, hydro):
-#     """Changes the display graph of supply-demand"""
-#     df = fetch_all_data()
-#     x = df['Datetime']
-#     supply = df['Wind'] * wind + df['Hydro'] * hydro + df['Fossil/Biomass'] + df['Nuclear']
-#     load = df['Load']
-
-#     fig = go.Figure()
-#     fig.add_trace(go.Scatter(x=x, y=supply, mode='none', name='supply', line={'width': 2, 'color': 'pink'},
-#                   fill='tozeroy'))
-#     fig.add_trace(go.Scatter(x=x, y=load, mode='none', name='demand', line={'width': 2, 'color': 'orange'},
-#                   fill='tonexty'))
-#     fig.update_layout(template='plotly_dark', title='Supply/Demand after Power Scaling',
-#                       plot_bgcolor='#23272c', paper_bgcolor='#23272c', yaxis_title='MW',
-#                       xaxis_title='Date/Time')
-#     return fig
-
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=1050, host='0.0.0.0')
