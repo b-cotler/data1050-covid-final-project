@@ -51,6 +51,8 @@ def description():
     return html.Div(children=[dcc.Markdown('''
         # COVID-19 and Political Demographics
 
+        ## About
+
         It's no secret that the COVID-19 pandemic has affected the lives of all Americans. At best,
         we've been sequestered at home in quarantine. At worst, we've lost the lives of people we
         care about. We've been left to make our own opinions on the federal government's handling of 
@@ -73,6 +75,7 @@ def description():
         This dashboard utilizes population data, presidential election results, and coronavired case and death counts.
         To build on this project, it would be interesting to merge demographc and economic information such as 
         unemployment data, income, and ethnicity as well as healthcare expenditures per capita.
+        
 
         ### Related Work
         - [Mail-in-voting as it realted to COVID-19](https://www.nature.com/articles/d41586-020-02979-x)
@@ -226,7 +229,7 @@ def project_details():
         General election results data from 2020 was taken from a publicy available dataset on [Kaggle]
         (https://www.kaggle.com/unanimad/us-election-2020) and 2016 general election data came from 
         the [MIT Election Lab](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX).
-        Additionally, populaition data was taken from [The US Census Bureau](https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/)
+        Additionally, population data was taken from [The US Census Bureau](https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/)
         in order to compare per-capita statistics. 
 
         ### Technology Stack
@@ -236,7 +239,7 @@ def project_details():
 
         ### ETL and Database Design
 
-        Our data is read from the links provided inot dataframes in the `data_aquire.py` script. Additionally, 
+        Our data is read from the links provided into dataframes in the `data_aquire.py` script. Additionally, 
         the script reformats and extracts the columns relevant to our analysis before upserting the rows of each
         dataframe as documents to 5 different collections in a MongoDB database. These 5 collections hold vote
         counts for 2016, vote counts for 2020, the number of new deaths for each day since February by county, the 
@@ -245,43 +248,46 @@ def project_details():
         where it is located. The `database.py` script then pulls the data from the database into dataframes that are
         used to create the visualizations in `app.py`
 
-        [ETL_ETA Notebook](link to EDL_ETA.ipynb)
-        [Enhancement Notebook](link to Enhancement.ipynb)
+        [ETL-EDA](https://colab.research.google.com/drive/1yk5KtZ6xdPCvOOSZKm6PS5HfPsLzwOrt#scrollTo=baENtC0LzWy8)
+
+        [Enhancement](https://colab.research.google.com/drive/1Yciqr2xjSUfUpXm_XNqHOY-IwcVS1rha#scrollTo=KovafjNXno78)
+        
+        [Visualization](https://colab.research.google.com/drive/1qfAKwnTV0_8X3j2STkA9Iacm1J6eSkZB#scrollTo=wC34L9RotdwA)
 
         ''', className='eleven columns', style={'paddingLeft': '5%'})], className="row")
 
 
-def architecture_summary():
-    """
-    Returns the text and image of architecture summary of the project.
-    """
-    return html.Div(children=[
+# def architecture_summary():
+#     """
+#     Returns the text and image of architecture summary of the project.
+#     """
+#     return html.Div(children=[
        
-        dcc.Markdown('''
-            #
-            ##
-            ###
-            #
-            ##
-            ###
-            # Project Architecture
-            This project uses MongoDB as the database. All data acquired are stored in raw form to the
-            database (with de-duplication). An abstract layer is built in `database.py` so all queries
-            can be done via function call. For a more complicated app, the layer will also be
-            responsible for schema consistency. A `plot.ly` & `dash` app is serving this web page
-            through. Actions on responsive components on the page is redirected to `app.py` which will
-            then update certain components on the page.  
-        ''', className='row eleven columns', style={'paddingLeft': '5%'}),
+#         dcc.Markdown('''
+#             #
+#             ##
+#             ###
+#             #
+#             ##
+#             ###
+#             # Project Architecture
+#             This project uses MongoDB as the database. All data acquired are stored in raw form to the
+#             database (with de-duplication). An abstract layer is built in `database.py` so all queries
+#             can be done via function call. For a more complicated app, the layer will also be
+#             responsible for schema consistency. A `plot.ly` & `dash` app is serving this web page
+#             through. Actions on responsive components on the page is redirected to `app.py` which will
+#             then update certain components on the page.  
+#         ''', className='row eleven columns', style={'paddingLeft': '5%'}),
 
-        html.Div(children=[
-            html.Img(src="https://docs.google.com/drawings/d/e/2PACX-1vQNerIIsLZU2zMdRhIl3ZZkDMIt7jhE_fjZ6ZxhnJ9bKe1emPcjI92lT5L7aZRYVhJgPZ7EURN0AqRh/pub?w=670&amp;h=457",
-                     className='row'),
-        ], className='row', style={'textAlign': 'center'}),
+#         html.Div(children=[
+#             html.Img(src="https://docs.google.com/drawings/d/e/2PACX-1vQNerIIsLZU2zMdRhIl3ZZkDMIt7jhE_fjZ6ZxhnJ9bKe1emPcjI92lT5L7aZRYVhJgPZ7EURN0AqRh/pub?w=670&amp;h=457",
+#                      className='row'),
+#         ], className='row', style={'textAlign': 'center'}),
 
-        dcc.Markdown('''
+#         dcc.Markdown('''
         
-        ''')
-    ], className='row')
+#         ''')
+#     ], className='row')
 
 
 # # Sequentially add page components to the app's layout
@@ -296,7 +302,6 @@ def dynamic_layout():
         dynamic_scatter_tool(),
         static_scatter(),
         dcc.Graph(id='static_scatter', figure=static_scatter_tool()),
-        architecture_summary(),
     ], className='row', id='content')
 
 
