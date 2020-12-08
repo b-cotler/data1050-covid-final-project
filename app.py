@@ -236,7 +236,7 @@ def project_details():
 
         ### ETL and Database Design
 
-        Our data is read from the links provided inot dataframes in the `data_aquire.py` script. Additionally, 
+        Our data is read from the links provided into dataframes in the `data_aquire.py` script. Additionally, 
         the script reformats and extracts the columns relevant to our analysis before upserting the rows of each
         dataframe as documents to 5 different collections in a MongoDB database. These 5 collections hold vote
         counts for 2016, vote counts for 2020, the number of new deaths for each day since February by county, the 
