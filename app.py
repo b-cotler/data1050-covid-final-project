@@ -72,7 +72,7 @@ def description():
         This project was developed by Alex Zimbalist, Brett Cotler, Cameron Webster, and Chris Rohlicek
 
         ### Possible Next Steps
-        This dashboard utilizes population data, presidential election results, and coronavired case and death counts.
+        This dashboard utilizes population data, presidential election results, and coronavirus case and death counts.
         To build on this project, it would be interesting to merge demographc and economic information such as 
         unemployment data, income, and ethnicity as well as healthcare expenditures per capita.
         
@@ -241,11 +241,12 @@ def project_details():
 
         Our data is read from the links provided into dataframes in the `data_aquire.py` script. Additionally, 
         the script reformats and extracts the columns relevant to our analysis before upserting the rows of each
-        dataframe as documents to 5 different collections in a MongoDB database. These 5 collections hold vote
-        counts for 2016, vote counts for 2020, the number of new deaths for each day since February by county, the 
-        number of new cases for each day since February by county, and the population of each county. Each of these
-        collections is linked by a county idenfitication variable, which is the name of the county and the state 
-        where it is located. The `database.py` script then pulls the data from the database into dataframes that are
+        dataframe as documents to 2 different collections in a MongoDB database. These collections hold vote
+        counts for each major candidate in 2016, vote counts for each major candidate in 2020, 
+        the number of new deaths for each day since March 1st in each state, the 
+        number of new cases for each day since March 1st in each state, and the population of each U.S. state.
+        The collections are linked by state name, which are unique in both collections.
+        The `database.py` script then pulls the data from the database into dataframes that are
         used to create the visualizations in `app.py`
 
         [ETL-EDA](https://colab.research.google.com/drive/1yk5KtZ6xdPCvOOSZKm6PS5HfPsLzwOrt#scrollTo=baENtC0LzWy8)
@@ -296,6 +297,7 @@ def dynamic_layout():
         page_header(),
         html.Hr(),
         description(),
+        project_details(),
         # dcc.Graph(id='trend-graph', figure=static_stacked_trend_graph(stack=False)),
         # dcc.Graph(id='stacked-trend-graph', figure=static_stacked_trend_graph(stack=True)),
         dynamic_scatter(),
